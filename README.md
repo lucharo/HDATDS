@@ -9,6 +9,8 @@ Functions built by March 31st:
 
 Install in your machine:
 ```
+library(devtools)
+library(dplyr)
 devtools::install_github("lc5415/HDATDS")
 library(HDATDS)
 ```
