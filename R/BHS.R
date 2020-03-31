@@ -1,4 +1,25 @@
-renameBio = function(bio.original, measurement = "first"){
+
+#' Format and rename colnames of original biomarker dataframe
+#'
+#' The UK Biobank biomarker dataset column names are code names. This function recode those names to match those
+#' of the look up table (bio.dict), so basically readable names.
+#'
+#' @param bio.original Original biomarker data frame with the first column being ID and the other columns
+#' being biomarker code and some 0 or 1 depending whether the biomarker measurement was the 'at-recruitment' measurement
+#' (0) or the one at follow-up (1)
+#' @param measurement Measurement time to retrieve. Options: "first"(Default), "second" or "both". Note: if you
+#' choose both the second biomarker colnames will be the biomarker names and ".1" appended to them, this will mess
+#' up with the BHS calculator formatting and is not currently supported. Get in touch if you want to implement that.
+#'
+#' @return Biomarker data frame with human readable names
+#'
+#' @examples
+#' library(HDATDS)
+#' data("bio.original_example")
+#'
+#' bio = renameBio(bio.original_example)
+#' @export
+formatBio = function(bio.original, measurement = "first"){
   ##################################################################
   ##              Changing biomarkers codes by names              ##
   ##################################################################
@@ -110,7 +131,7 @@ quantile_check = function(column, reference, dataset){
 #'
 #' @param bio_df Dataframe containing the biomarkers and the age and gender information if stratified analyis
 #' is desired. Additionally the IDs need to be available in the dataframes rownames.
-#' Example dataframe provided at: HDATDS::bio.example
+#' Example dataframe provided at: \code{HDATDS::bio.example}
 #' @param reference Which reference from the look-up table to use. Options are: "Mantej", "Paper" or "Barbara"
 #'  This reference is used for both the "by systems" calculation and the quantiles calculation
 #' @param stratified Whether or not the BHS calculation should be performed stratifiying by age group and gender
@@ -120,7 +141,7 @@ quantile_check = function(column, reference, dataset){
 #'  biomarker scores (bySystems = F)
 #'  @param lookUpTable (set equal to bio.dict [internal variable] by default). Dataframe containing the reference
 #'  values to look up. Can be made custom but will need to have the same biomarker names than bio.dict.
-#'  Load bio.dict: bio.dict = HDATDS::bio.dict
+#'  Load bio.dict: \code{bio.dict = HDATDS::bio.dict}
 #'
 #' @return A vector containing all the biological health scores for all inviduals. The vector is sorted in the same
 #'  order than the original data frame (bio_df) so that it can simply be concatenated (cbind) to the original dataframe.
@@ -130,9 +151,9 @@ quantile_check = function(column, reference, dataset){
 #' @examples
 #'
 #'# Original biomarker dataframe
-#'bio.original = HDATDS::bio.original
+#' data("bio.original_example")
 #'
-#'bio = renameBio(bio.original, measurement = "first")
+#' bio = formatBio(bio.original, measurement = "first")
 #'
 #' # Load biomarkers and covariates data frames (bio and cov) and merge them by ID
 #' bio = merge(bio, cov[,c("ID","age_cl","gender")], by = "ID")

@@ -15,7 +15,7 @@ BHSCalculator(
 \arguments{
 \item{bio_df}{Dataframe containing the biomarkers and the age and gender information if stratified analyis
 is desired. Additionally the IDs need to be available in the dataframes rownames.
-Example dataframe provided at: HDATDS::bio.example}
+Example dataframe provided at: \code{HDATDS::bio.example}}
 
 \item{reference}{Which reference from the look-up table to use. Options are: "Mantej", "Paper" or "Barbara"
 This reference is used for both the "by systems" calculation and the quantiles calculation}
@@ -28,7 +28,7 @@ then calculating the mean across systems (bySystems = T) or simply taking the no
 biomarker scores (bySystems = F)
 @param lookUpTable (set equal to bio.dict [internal variable] by default). Dataframe containing the reference
 values to look up. Can be made custom but will need to have the same biomarker names than bio.dict.
-Load bio.dict: bio.dict = HDATDS::bio.dict}
+Load bio.dict: \code{bio.dict = HDATDS::bio.dict}}
 }
 \value{
 A vector containing all the biological health scores for all inviduals. The vector is sorted in the same
@@ -51,9 +51,9 @@ the relevant quartiles for the given combination of biomarkers and reference cho
 \examples{
 
 # Original biomarker dataframe
-bio.original = HDATDS::bio.original
+data("bio.original_example")
 
-bio = renameBio(bio.original, measurement = "first")
+bio = formatBio(bio.original, measurement = "first")
 
 # Load biomarkers and covariates data frames (bio and cov) and merge them by ID
 bio = merge(bio, cov[,c("ID","age_cl","gender")], by = "ID")
