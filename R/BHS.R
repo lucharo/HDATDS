@@ -164,7 +164,7 @@ quantile_check = function(column, reference, dataset){
 #' bio$gender = as.factor(bio$gender)
 #'
 #' # Run BHS calculation using paper reference
-#' scores_paper = BHSCalculator("Paper", stratified = T, bySystems = T)
+#' scores_paper = BHSCalculator(bio, "Paper", stratified = T, bySystems = T)
 #' @export
 BHSCalculator = function(bio_df, reference, stratified = F, bySystems = T, lookUpTable = bio.dict){
   # reference can take values:

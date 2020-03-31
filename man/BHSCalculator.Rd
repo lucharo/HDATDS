@@ -64,7 +64,7 @@ bio$age_cl = as.factor(bio$age_cl)
 bio$gender = as.factor(bio$gender)
 
 # Run BHS calculation using paper reference
-scores_paper = BHSCalculator("Paper", stratified = T, bySystems = T)
+scores_paper = BHSCalculator(bio, "Paper", stratified = T, bySystems = T)
 }
 \references{
 Karimi, Maryam, Raphaële Castagné, Cyrille Delpierre, Gaëlle Albertus, Eloïse Berger,
