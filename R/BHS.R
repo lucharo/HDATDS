@@ -1,3 +1,7 @@
+#' @importFrom magrittr %>%
+#' @export
+magrittr::`%>%`
+
 
 #' Format and rename colnames of original biomarker dataframe
 #'
@@ -146,7 +150,6 @@ quantile_check = function(column, reference, dataset){
 #' @return A vector containing all the biological health scores for all inviduals. The vector is sorted in the same
 #'  order than the original data frame (bio_df) so that it can simply be concatenated (cbind) to the original dataframe.
 #'  Additionally, the rownames of the output contain the original rownames (IDs)
-#'
 #'
 #' @examples
 #'
