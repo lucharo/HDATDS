@@ -4,11 +4,18 @@
 \alias{BHSCalculator}
 \title{Biological Health Score (BHS) calculator}
 \usage{
-BHSCalculator(bio_df, reference, stratified = F, bySystems = T)
+BHSCalculator(
+  bio_df,
+  reference,
+  stratified = F,
+  bySystems = T,
+  lookUpTable = bio.dict
+)
 }
 \arguments{
 \item{bio_df}{Dataframe containing the biomarkers and the age and gender information if stratified analyis
-is desired. Additionally the IDs need to be available in the dataframes rownames}
+is desired. Additionally the IDs need to be available in the dataframes rownames.
+Example dataframe provided at: HDATDS::bio.example}
 
 \item{reference}{Which reference from the look-up table to use. Options are: "Mantej", "Paper" or "Barbara"
 This reference is used for both the "by systems" calculation and the quantiles calculation}
@@ -18,7 +25,10 @@ group or not (at the moment only these stratifications are supported and are not
 
 \item{bySystems}{Whether or not the BHS calculation should be done by first calculating scores by system and
 then calculating the mean across systems (bySystems = T) or simply taking the non weighted average of all the
-biomarker scores (bySystems = F)}
+biomarker scores (bySystems = F)
+@param lookUpTable (set equal to bio.dict [internal variable] by default). Dataframe containing the reference
+values to look up. Can be made custom but will need to have the same biomarker names than bio.dict.
+Load bio.dict: bio.dict = HDATDS::bio.dict}
 }
 \value{
 A vector containing all the biological health scores for all inviduals. The vector is sorted in the same
@@ -30,12 +40,21 @@ This function implements the BHS calculation method presented by Karimi et. al(2
 }
 \details{
 The function has 3 main working parts:
-* 1. Making a quantile look-up table: this part calls the function HDATDS::quantile_check() to calculate
+
+1. Making a quantile look-up table: this part calls the function HDATDS::quantile_check() to calculate
 the relevant quartiles for the given combination of biomarkers and reference choice.
-* 2. For every biomarker (and each strata if relevant (and if stratified = TRUE)), get the score for each individual
-* 3. Calculate the aggregated score (by systems if bySystems is TRUE)
+
+2. For every biomarker (and each strata if relevant (and if stratified = TRUE)), get the score for each individual
+
+3. Calculate the aggregated score (by systems if bySystems is TRUE)
 }
 \examples{
+
+# Original biomarker dataframe
+bio.original = HDATDS::bio.original
+
+bio = renameBio(bio.original, measurement = "first")
+
 # Load biomarkers and covariates data frames (bio and cov) and merge them by ID
 bio = merge(bio, cov[,c("ID","age_cl","gender")], by = "ID")
 ids = bio$ID # keeping explicit copy of IDs

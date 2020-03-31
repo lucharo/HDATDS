@@ -1,3 +1,43 @@
+renameBio = function(bio.original, measurement = "first"){
+  ##################################################################
+  ##              Changing biomarkers codes by names              ##
+  ##################################################################
+  #make nicely looking names (programmingly functional)
+  colnames(bio.dict) = make.names(colnames(bio.dict), unique=TRUE)
+
+  #get column numbers of columns with name containing pattern *(.)1(.)*
+  # use (.) to match the dot as opposed to using . as a wildcard
+
+  if (measurement == "first"){
+    bio = bio.original[,c(T, !grepl("*(.)1(.)0", colnames(bio.original)[-1]))]
+  }else if (measurement == "second"){
+    bio = bio.original[,c(T, !grepl("*(.)0(.)0", colnames(bio.original)[-1]))]
+  } else if(measurement == "both"){
+    bio = bio.original
+  } else {
+    stop("Please input a valid argument for measurement (Options: first, second, both")
+  }
+
+  # Match code with biomarker name to change column names of b
+  # get element 2 to 6 of all string in vector colnames(b)
+  # the match() function, match the substring from colnames to
+  # the UK.biobank.field in the biomarkers dictionary,
+  # effectively ordering the colnames of b
+  # Alternative: order UK.bionbank.field entries and match them
+  #---- bio.dict = bio.dict %>% arrange(UK.Biobank.Field)
+
+  colnames(bio)[-1] = bio.dict$Biomarker.name[
+    match(substring(colnames(bio)[-1],2,6),bio.dict$UK.Biobank.Field)]
+
+  colnames(bio)[-1] = make.names(colnames(bio)[-1], unique=TRUE)
+  colnames(bio)[-1] = sub("\\.\\.",".", colnames(bio)[-1])
+
+  # safety-check for all vars being numeric
+  stopifnot(all(apply(bio, 2, is.numeric)))
+
+  bio
+}
+
 
 #' Calculate 1st or 3rd quantile for a given biomarker
 #'
@@ -55,10 +95,13 @@ quantile_check = function(column, reference, dataset){
 #' This function implements the BHS calculation method presented by Karimi et. al(2018).
 #'
 #' @details The function has 3 main working parts:
-#' * 1. Making a quantile look-up table: this part calls the function HDATDS::quantile_check() to calculate
+#'
+#' 1. Making a quantile look-up table: this part calls the function HDATDS::quantile_check() to calculate
 #' the relevant quartiles for the given combination of biomarkers and reference choice.
-#' * 2. For every biomarker (and each strata if relevant (and if stratified = TRUE)), get the score for each individual
-#' * 3. Calculate the aggregated score (by systems if bySystems is TRUE)
+#'
+#' 2. For every biomarker (and each strata if relevant (and if stratified = TRUE)), get the score for each individual
+#'
+#' 3. Calculate the aggregated score (by systems if bySystems is TRUE)
 #'
 #' @references Karimi, Maryam, Raphaële Castagné, Cyrille Delpierre, Gaëlle Albertus, Eloïse Berger,
 #'  Paolo Vineis, Meena Kumari, Michelle Kelly-Irving, and Marc Chadeau-Hyam. 2019. “Early-Life
@@ -66,7 +109,8 @@ quantile_check = function(column, reference, dataset){
 #'  Understanding Society.” Journal of Epidemiology and Community Health 73(8):693–702.
 #'
 #' @param bio_df Dataframe containing the biomarkers and the age and gender information if stratified analyis
-#' is desired. Additionally the IDs need to be available in the dataframes rownames
+#' is desired. Additionally the IDs need to be available in the dataframes rownames.
+#' Example dataframe provided at: HDATDS::bio.example
 #' @param reference Which reference from the look-up table to use. Options are: "Mantej", "Paper" or "Barbara"
 #'  This reference is used for both the "by systems" calculation and the quantiles calculation
 #' @param stratified Whether or not the BHS calculation should be performed stratifiying by age group and gender
@@ -74,6 +118,9 @@ quantile_check = function(column, reference, dataset){
 #' @param bySystems Whether or not the BHS calculation should be done by first calculating scores by system and
 #'  then calculating the mean across systems (bySystems = T) or simply taking the non weighted average of all the
 #'  biomarker scores (bySystems = F)
+#'  @param lookUpTable (set equal to bio.dict [internal variable] by default). Dataframe containing the reference
+#'  values to look up. Can be made custom but will need to have the same biomarker names than bio.dict.
+#'  Load bio.dict: bio.dict = HDATDS::bio.dict
 #'
 #' @return A vector containing all the biological health scores for all inviduals. The vector is sorted in the same
 #'  order than the original data frame (bio_df) so that it can simply be concatenated (cbind) to the original dataframe.
@@ -81,6 +128,12 @@ quantile_check = function(column, reference, dataset){
 #'
 #'
 #' @examples
+#'
+#'# Original biomarker dataframe
+#'bio.original = HDATDS::bio.original
+#'
+#'bio = renameBio(bio.original, measurement = "first")
+#'
 #' # Load biomarkers and covariates data frames (bio and cov) and merge them by ID
 #' bio = merge(bio, cov[,c("ID","age_cl","gender")], by = "ID")
 #' ids = bio$ID # keeping explicit copy of IDs
@@ -92,7 +145,7 @@ quantile_check = function(column, reference, dataset){
 #' # Run BHS calculation using paper reference
 #' scores_paper = BHSCalculator("Paper", stratified = T, bySystems = T)
 #' @export
-BHSCalculator = function(bio_df, reference, stratified = F, bySystems = T){
+BHSCalculator = function(bio_df, reference, stratified = F, bySystems = T, lookUpTable = bio.dict){
   # reference can take values:
   # -- "Mantej"
   # or
