@@ -6,7 +6,7 @@ Functions built by March 31st:
 * `BHSCalculator()`
 * `factorBio()`
 * `quantile_check()` --> mostly internal use
-
+* `Analysis()`: performs cross-validation for any given model and given dataset or combination of datasets
 Install in your machine:
 ```
 library(devtools)
