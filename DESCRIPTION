@@ -12,6 +12,10 @@ License: MIT-License
 Encoding: UTF-8
 LazyData: true
 Imports:
-  dplyr,
-  tidyr  
+    dplyr,
+    tidyr,
+    xgboost,
+    e1071,
+    ROCR,
+    glmnet
 RoxygenNote: 7.1.0

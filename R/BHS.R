@@ -143,10 +143,10 @@ quantile_check = function(column, reference, dataset){
 #' @param bySystems Whether or not the BHS calculation should be done by first calculating scores by system and
 #'  then calculating the mean across systems (bySystems = T) or simply taking the non weighted average of all the
 #'  biomarker scores (bySystems = F)
-#'
-#' @param lookUpTable (set equal to bio.dict [internal variable] by default). Dataframe containing the reference
-#'  values to look up. Can be made custom but will need to have the same biomarker names than bio.dict.
-#'  Load bio.dict: \code{bio.dict = HDATDS::bio.dict}
+#
+#' @param lookUpTable Dataframe containing the reference values to look up. Can be made custom but will
+#' need to have the same biomarker names than bio.dict. Load bio.dict: \code{bio.dict = data("bio.dict")}
+#' (set equal to bio.dict [internal variable] by default)
 #'
 #' @return A vector containing all the biological health scores for all inviduals. The vector is sorted in the same
 #'  order than the original data frame (bio_df) so that it can simply be concatenated (cbind) to the original dataframe.
