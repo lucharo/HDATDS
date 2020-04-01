@@ -1,0 +1,49 @@
+package:
+  name: r-hdatds
+  version: 0.0.1
+
+build:
+  rpaths:
+    - lib/R/lib/
+    - lib/
+
+# Suggests: covr, mockery, testthat
+requirements:
+  build:
+
+  host:
+    - {{ environ.get('R_VERSION') }}
+    - r-base
+    - r-dplyr
+    - r-ROCR
+    - r-tidyr
+    - r-e1071
+    - r-glmnet
+    - r-xgboost
+
+  run:
+    - {{ environ.get('R_VERSION') }}
+    - r-base
+    - r-dplyr
+    - r-ROCR
+    - r-tidyr
+    - r-e1071
+    - r-glmnet
+    - r-xgboost
+
+test:
+  commands:
+    # You can put additional test commands to be run here.
+    - $R -e "library('HDATDS')"           # [not win]
+
+  # You can also put a file called run_test.py, run_test.sh, or run_test.bat
+  # in the recipe that will be run at test time.
+
+  # requires:
+    # Put any additional test requirements here.
+
+about:
+  home: https://github.com/lc5415/HDATDS
+  license: MIT + file LICENSE
+  summary: TDS package
+  license_family: MIT
