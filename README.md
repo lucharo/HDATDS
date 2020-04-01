@@ -7,7 +7,8 @@ Functions built by March 31st:
 * `factorBio()`
 * `quantile_check()` --> mostly internal use
 * `Analysis()`: performs cross-validation for any given model and given dataset or combination of datasets
-Install in your machine:
+
+__Install in your machine (from RStudio):__
 ```
 library(devtools)
 library(dplyr)
@@ -15,7 +16,12 @@ devtools::install_github("lc5415/HDATDS")
 library(HDATDS)
 ```
 
-Example code:
+__Install in your machine (Terminal):__
+```
+conda install -c lucha6 r-hdatds
+```
+
+__Example code:__
 ```
 # Original biomarker dataframe
 data("bio.original_example")
