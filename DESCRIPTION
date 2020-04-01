@@ -17,5 +17,6 @@ Imports:
     xgboost,
     e1071,
     ROCR,
-    glmnet
+    glmnet,
+    magrittr
 RoxygenNote: 7.1.0
