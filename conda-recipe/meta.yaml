@@ -1,18 +1,22 @@
 package:
   name: r-hdatds
-  version: 0.0.1
+  version: 0.1.0
 
-build:
-  rpaths:
-    - lib/R/lib/
-    - lib/
+source:
+  # simply where it sits in git
+  git_url: https://github.com/lc5415/HDATDS.git
 
-# Suggests: covr, mockery, testthat
 requirements:
-  build:
+# My understanding is that requirements needs to include the package 
+# dependecies (aka other packages called in the package I am uploading)
+# 
+# package can be built by calling conda build . from within the package folde
+# given that the folder contains meta.yaml file like this one and the build.sh file
 
-  host:
-    - {{ environ.get('R_VERSION') }}
+# then I can run
+# conda convert --platform all /opt/anaconda3/conda-bld/osx-64/r-hdatds-0.1.0-r35_0.tar.bz2
+# to make the package be usable acrros different platforms
+  build:
     - r-base
     - r-dplyr
     - r-ROCR
@@ -22,7 +26,6 @@ requirements:
     - r-xgboost
 
   run:
-    - {{ environ.get('R_VERSION') }}
     - r-base
     - r-dplyr
     - r-ROCR
@@ -31,10 +34,10 @@ requirements:
     - r-glmnet
     - r-xgboost
 
-test:
-  commands:
+#test:
+ # commands:
     # You can put additional test commands to be run here.
-    - $R -e "library('HDATDS')"           # [not win]
+  #  - $R -e "library('HDATDS')"           # [not win]
 
   # You can also put a file called run_test.py, run_test.sh, or run_test.bat
   # in the recipe that will be run at test time.
@@ -42,8 +45,13 @@ test:
   # requires:
     # Put any additional test requirements here.
 
+
+
 about:
+  # user-oriented info to be displayed in anaconda.org
   home: https://github.com/lc5415/HDATDS
-  license: MIT + file LICENSE
-  summary: TDS package
+  license: MIT
+  summary: This package was developed as a learning exercise and also to share
+   useful functions for the Computational Epidemiology and Translational Data Sciences
+   with my colleagues from the MSc in Health Data Analytics & Machine Learning
   license_family: MIT
