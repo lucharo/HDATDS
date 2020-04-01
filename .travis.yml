@@ -1,1 +1,7 @@
 language: r
+
+os:
+  - linux
+  - osx
+pandoc: false
+latex: false

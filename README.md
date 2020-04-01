@@ -17,7 +17,10 @@ library(HDATDS)
 ```
 
 __Install in your machine (Terminal):__
+I would recommend installing this package in a new environment given dependecy issues may arise otherwise.
 ```
+conda create --name NewProjectEnv
+conda activate NewProjectEnv
 conda install -c lucha6 r-hdatds
 ```
 
