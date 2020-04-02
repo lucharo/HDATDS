@@ -1,6 +1,6 @@
 package:
   name: r-hdatds
-  version: 0.1.0
+  version: 0.1.1
 
 source:
   # simply where it sits in git
@@ -18,13 +18,6 @@ requirements:
 # to make the package be usable acrros different platforms
   build:
     - r-base
-    - r-dplyr
-    - r-ROCR
-    - r-tidyr
-    - r-e1071
-    - r-glmnet
-    - r-xgboost
-
   run:
     - r-base
     - r-dplyr
