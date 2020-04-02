@@ -1,6 +1,6 @@
 package:
   name: r-hdatds
-  version: 0.1.0
+  version: 0.1.1
 
 source:
   # simply where it sits in git
