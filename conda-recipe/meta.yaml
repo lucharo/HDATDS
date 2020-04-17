@@ -1,6 +1,6 @@
 package:
   name: r-hdatds
-  version: 0.1.1
+  version: 0.2
 
 source:
   # simply where it sits in git
@@ -21,9 +21,16 @@ requirements:
 # conda convert --platform all /opt/anaconda3/conda-bld/osx-64/r-hdatds-0.1.0-r35_0.tar.bz2
 # to make the package be usable acrros different platforms
   build:
-    - r-base
+    - {{ compiler('c') }}
   host:
     - r-base
+    - r-dplyr
+    - r-ROCR
+    - r-tidyr
+    - r-e1071
+    - r-glmnet
+    - r-xgboost
+
   run:
     - r-base
     - r-dplyr
@@ -33,10 +40,10 @@ requirements:
     - r-glmnet
     - r-xgboost
 
-#test:
- # commands:
+test:
+ commands:
     # You can put additional test commands to be run here.
-  #  - $R -e "library('HDATDS')"           # [not win]
+   - $R -e "library('HDATDS')"           # [not win]
 
   # You can also put a file called run_test.py, run_test.sh, or run_test.bat
   # in the recipe that will be run at test time.
