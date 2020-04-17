@@ -14,6 +14,7 @@ Functions built by March 31st:
 * `Analysis()`: performs cross-validation for any given model and given dataset or combination of datasets
 
 __Install in your machine (from RStudio):__
+_Note:_ the imperial HPC RStudio session cannot install xgboost which is a dependency of this package, so __do not try to install this package from the HPC RStudio.__
 ```
 library(devtools)
 library(dplyr)
