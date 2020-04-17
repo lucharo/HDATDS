@@ -5,6 +5,10 @@ package:
 source:
   # simply where it sits in git
   git_url: https://github.com/lc5415/HDATDS.git
+  
+build:            # from HPC support guy
+  skip: True      # [win]
+  number: 0
 
 requirements:
 # My understanding is that requirements needs to include the package 
@@ -16,7 +20,7 @@ requirements:
 # then I can run
 # conda convert --platform all /opt/anaconda3/conda-bld/osx-64/r-hdatds-0.1.0-r35_0.tar.bz2
 # to make the package be usable acrros different platforms
-  build:
+  host:
     - r-base
   run:
     - r-base
