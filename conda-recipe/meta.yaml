@@ -20,6 +20,9 @@ requirements:
 # then I can run
 # conda convert --platform all /opt/anaconda3/conda-bld/osx-64/r-hdatds-0.1.0-r35_0.tar.bz2
 # to make the package be usable acrros different platforms
+  
+  build:
+    - r-base
   host:
     - r-base
   run:
