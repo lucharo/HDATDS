@@ -1,9 +1,6 @@
-# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-# PACKAGE IN PROGRESS. DOWNLOAD AT YOUR OWN RISK
-# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-
 # HDATDS
+![](https://www.travis-ci.org/lc5415/HDATDS.svg?branch=master)
+
 Package with useful functions for the MSc HDA&amp;ML Translational Data Sciences and Computational Epidemiology projects
 
 Functions built by March 31st:
