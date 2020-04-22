@@ -7,8 +7,8 @@
 BHSCalculator(
   bio_df,
   reference,
-  stratified = F,
-  bySystems = T,
+  stratified = FALSE,
+  bySystems = TRUE,
   lookUpTable = bio.dict
 )
 }
@@ -24,8 +24,8 @@ This reference is used for both the "by systems" calculation and the quantiles c
 group or not (at the moment only these stratifications are supported and are not customisable)}
 
 \item{bySystems}{Whether or not the BHS calculation should be done by first calculating scores by system and
-then calculating the mean across systems (bySystems = T) or simply taking the non weighted average of all the
-biomarker scores (bySystems = F)}
+then calculating the mean across systems (bySystems = TRUE) or simply taking the non weighted average of all the
+biomarker scores (bySystems = FALSE)}
 
 \item{lookUpTable}{Dataframe containing the reference values to look up. Can be made custom but will
 need to have the same biomarker names than bio.dict. Load bio.dict: \code{bio.dict = data("bio.dict")}
@@ -52,20 +52,20 @@ the relevant quartiles for the given combination of biomarkers and reference cho
 \examples{
 
 # Original biomarker dataframe
-data("bio.original_example")
-
-bio = formatBio(bio.original, measurement = "first")
-
+data("bio.example")
+data("cov")
 # Load biomarkers and covariates data frames (bio and cov) and merge them by ID
-bio = merge(bio, cov[,c("ID","age_cl","gender")], by = "ID")
+bio = merge(bio.example, cov[,c("ID","age_cl","gender")], by = "ID")
 ids = bio$ID # keeping explicit copy of IDs
 rownames(bio) = bio[,1] # assuming ID is the first column
 bio = bio[,-1]
 bio$age_cl = as.factor(bio$age_cl)
 bio$gender = as.factor(bio$gender)
 
+bio = bio[complete.cases(bio), ] #function does not handle NAs internally
+
 # Run BHS calculation using paper reference
-scores_paper = BHSCalculator(bio, "Paper", stratified = T, bySystems = T)
+scores_paper = BHSCalculator(bio, "Paper", stratified = TRUE, bySystems = TRUE)
 }
 \references{
 Karimi, Maryam, Raphaële Castagné, Cyrille Delpierre, Gaëlle Albertus, Eloïse Berger,

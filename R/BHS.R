@@ -19,9 +19,9 @@ magrittr::`%>%`
 #'
 #' @examples
 #' library(HDATDS)
-#' data("bio.original_example")
+#' data("bio.original_example") # this loads an object called bio.original
 #'
-#' bio = renameBio(bio.original_example)
+#' bio = formatBio(bio.original)
 #' @export
 formatBio = function(bio.original, measurement = "first"){
   ##################################################################
@@ -34,9 +34,9 @@ formatBio = function(bio.original, measurement = "first"){
   # use (.) to match the dot as opposed to using . as a wildcard
 
   if (measurement == "first"){
-    bio = bio.original[,c(T, !grepl("*(.)1(.)0", colnames(bio.original)[-1]))]
+    bio = bio.original[,c(TRUE, !grepl("*(.)1(.)0", colnames(bio.original)[-1]))]
   }else if (measurement == "second"){
-    bio = bio.original[,c(T, !grepl("*(.)0(.)0", colnames(bio.original)[-1]))]
+    bio = bio.original[,c(TRUE, !grepl("*(.)0(.)0", colnames(bio.original)[-1]))]
   } else if(measurement == "both"){
     bio = bio.original
   } else {
@@ -141,8 +141,8 @@ quantile_check = function(column, reference, dataset){
 #' @param stratified Whether or not the BHS calculation should be performed stratifiying by age group and gender
 #'  group or not (at the moment only these stratifications are supported and are not customisable)
 #' @param bySystems Whether or not the BHS calculation should be done by first calculating scores by system and
-#'  then calculating the mean across systems (bySystems = T) or simply taking the non weighted average of all the
-#'  biomarker scores (bySystems = F)
+#'  then calculating the mean across systems (bySystems = TRUE) or simply taking the non weighted average of all the
+#'  biomarker scores (bySystems = FALSE)
 #
 #' @param lookUpTable Dataframe containing the reference values to look up. Can be made custom but will
 #' need to have the same biomarker names than bio.dict. Load bio.dict: \code{bio.dict = data("bio.dict")}
@@ -155,22 +155,22 @@ quantile_check = function(column, reference, dataset){
 #' @examples
 #'
 #'# Original biomarker dataframe
-#' data("bio.original_example")
-#'
-#' bio = formatBio(bio.original, measurement = "first")
-#'
+#' data("bio.example")
+#' data("cov")
 #' # Load biomarkers and covariates data frames (bio and cov) and merge them by ID
-#' bio = merge(bio, cov[,c("ID","age_cl","gender")], by = "ID")
+#' bio = merge(bio.example, cov[,c("ID","age_cl","gender")], by = "ID")
 #' ids = bio$ID # keeping explicit copy of IDs
 #' rownames(bio) = bio[,1] # assuming ID is the first column
 #' bio = bio[,-1]
 #' bio$age_cl = as.factor(bio$age_cl)
 #' bio$gender = as.factor(bio$gender)
 #'
+#' bio = bio[complete.cases(bio), ] #function does not handle NAs internally
+#'
 #' # Run BHS calculation using paper reference
-#' scores_paper = BHSCalculator(bio, "Paper", stratified = T, bySystems = T)
+#' scores_paper = BHSCalculator(bio, "Paper", stratified = TRUE, bySystems = TRUE)
 #' @export
-BHSCalculator = function(bio_df, reference, stratified = F, bySystems = T, lookUpTable = bio.dict){
+BHSCalculator = function(bio_df, reference, stratified = FALSE, bySystems = TRUE, lookUpTable = bio.dict){
   # reference can take values:
   # -- "Mantej"
   # or
@@ -209,8 +209,8 @@ BHSCalculator = function(bio_df, reference, stratified = F, bySystems = T, lookU
                                 lapply(colnames(bio.per.class),
                                        function(x) quantile_check(x, reference = MoreIsBad, bio.per.class))),
                               nrow=length(colnames(bio.per.class)),
-                              byrow=T), stringsAsFactors = F),
-                            stringsAsFactors = F)
+                              byrow=TRUE), stringsAsFactors = FALSE),
+                            stringsAsFactors = FALSE)
 
         colnames(result)[2:3] = c("Quantile.value", "Quartile")
         result = cbind(result, AgeClass = age.class, Gender = gender)
@@ -220,7 +220,7 @@ BHSCalculator = function(bio_df, reference, stratified = F, bySystems = T, lookU
     }
 
     # take only complete cases
-    relevant_quantiles = relevant_quantiles[complete.cases(relevant_quantiles),]
+    relevant_quantiles = relevant_quantiles[stats::complete.cases(relevant_quantiles),]
 
   } else {
     relevant_quantiles = data.frame(Biomarker = colnames(bio_df[,-c(ncol(bio_df)-1, ncol(bio_df))]),
@@ -229,14 +229,14 @@ BHSCalculator = function(bio_df, reference, stratified = F, bySystems = T, lookU
                                         lapply(colnames(bio_df[,-c(ncol(bio_df)-1, ncol(bio_df))]),
                                                function(x) quantile_check(x, reference = MoreIsBad, bio_df))),
                                       nrow=length(colnames(bio_df[,-c(ncol(bio_df)-1, ncol(bio_df))])),
-                                      byrow=T), stringsAsFactors = F),
-                                    stringsAsFactors = F)
+                                      byrow=TRUE), stringsAsFactors = FALSE),
+                                    stringsAsFactors = FALSE)
 
 
     colnames(relevant_quantiles)[2:3] = c("Quantile.value", "Quartile")
 
     # take only complete cases
-    relevant_quantiles = relevant_quantiles[complete.cases(relevant_quantiles),]
+    relevant_quantiles = relevant_quantiles[stats::complete.cases(relevant_quantiles),]
   }
 
 
@@ -250,7 +250,7 @@ BHSCalculator = function(bio_df, reference, stratified = F, bySystems = T, lookU
 
     # initialising empty dataframe with dims of however many biomarkers are being considered
     # could add two extra columns for each strata
-    bio.score = bio_df[F,unique(relevant_quantiles$Biomarker)]
+    bio.score = bio_df[FALSE,unique(relevant_quantiles$Biomarker)]
 
     for (gender in unique(bio_df$gender)){
       for (age in unique(bio_df$age_cl)){
@@ -261,6 +261,7 @@ BHSCalculator = function(bio_df, reference, stratified = F, bySystems = T, lookU
         relevant_quantiles.age.gender = relevant_quantiles[relevant_quantiles$AgeClass==age &
                                                              relevant_quantiles$Gender == gender,]
         attach(relevant_quantiles.age.gender)
+        on.exit()
         res = lapply(Biomarker, # for each biomarker from relevant_quantiles.age.gender
                      function(x){ # if the biomarker is bad in excess (i.e. boundary is 3rd quartile)
                        # return the element-wise comparison to the relevant quartile value
@@ -271,8 +272,8 @@ BHSCalculator = function(bio_df, reference, stratified = F, bySystems = T, lookU
                                        Quantile.value[Biomarker == x]))
                      })
         res = data.frame(matrix(unlist(res),
-                                ncol = length(Biomarker), byrow = F), # put in right format
-                         stringsAsFactors = F)
+                                ncol = length(Biomarker), byrow = FALSE), # put in right format
+                         stringsAsFactors = FALSE)
         rownames(res) = rownames(bio.sub)
         colnames(res) = Biomarker
         #res$AgeCl = age
@@ -291,6 +292,7 @@ BHSCalculator = function(bio_df, reference, stratified = F, bySystems = T, lookU
 
   }else{
     attach(relevant_quantiles)
+    on.exit()
     # bio.score is a list containing for each biomarker (first subset of list)
     # for each individual whether the value of that biomarker is in the healthy/unhealthy range(FALSE, TRUE)
     # respectively
@@ -307,8 +309,8 @@ BHSCalculator = function(bio_df, reference, stratified = F, bySystems = T, lookU
     # a vector with a length equal to the number of elements in the original list.
     # byrow in this case must be equal to FALSE
     bio.score = data.frame(matrix(unlist(bio.score),
-                                  ncol = length(Biomarker), byrow = F),
-                           stringsAsFactors = F)
+                                  ncol = length(Biomarker), byrow = FALSE),
+                           stringsAsFactors = FALSE)
     rownames(bio.score) = rownames(bio_df)
     detach(relevant_quantiles)
   }
@@ -327,7 +329,7 @@ BHSCalculator = function(bio_df, reference, stratified = F, bySystems = T, lookU
     bio.score$ID = rownames(bio.score)
     bio.score = bio.score %>% tidyr::gather(key = "Biomarker", value = "Amount", -ID) %>%
       merge(y = bio.dict[,c(systems.ref, "Biomarker name")],
-            all.x = T, by.x = "Biomarker", by.y = "Biomarker name")
+            all.x = TRUE, by.x = "Biomarker", by.y = "Biomarker name")
     colnames(bio.score)[ncol(bio.score)] = "System"
     # get score for each individual by ID and individual system
     bio.score = bio.score %>% dplyr::group_by(ID, System) %>% dplyr::summarise(BHSsystem = mean(Amount))

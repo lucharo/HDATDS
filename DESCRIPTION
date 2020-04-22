@@ -5,12 +5,12 @@ Authors@R:
     person(given = "Luis",
            family = "Chaves",
            role = c("aut","cre"),
-           email = "lc5415@ic.ac.uk",
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: Includes some useful functions for the MSc HDA&ML Translational Data Sciences and Computational epidemiology project
-License: MIT-License
+           email = "lc5415@ic.ac.uk")
+Description: Includes some useful functions for the MSc HDA&ML Translational Data Sciences and Computational epidemiology project.
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
+Depends: R (>= 2.10)
 Imports:
     dplyr,
     tidyr,
@@ -18,5 +18,7 @@ Imports:
     e1071,
     ROCR,
     glmnet,
-    magrittr
+    magrittr,
+    stats,
+    graphics
 RoxygenNote: 7.1.0

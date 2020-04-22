@@ -1,2 +1,9 @@
 ^HDATDS\.Rproj$
 ^\.Rproj\.user$
+
+
+^\.travis\.yml$
+^\.github$
+^conda-recipe$
+^BuildConvert\.sh$
+^LICENSE\.md$

@@ -20,9 +20,9 @@ happens internally}
 
 \item{outcome}{Response variable of choice. Must be one of the columns in data.}
 
-\item{train.proportion}{Proportion of data to be kept for training (default = 0.8)}
+\item{kfolds}{Number of folds for k-fold cross validation. (default = 5)}
 
-\item{folds}{Number of folds for k-fold cross validation. (default = 5)}
+\item{train.proportion}{Proportion of data to be kept for training (default = 0.8)}
 }
 \value{
 A plot of the ROC curve from test data and the corresponding AUC value
@@ -37,8 +37,9 @@ and then the training set is split into folds. The same folds are created at eac
 performance is comparable across models and not affected by random chance.
 }
 \examples{
-data(mtcars)
-
-Analysis("svm", mtcars, outcome = "cyl")
+data(iris)
+iris = iris \%>\% dplyr::filter(Species!="virginica") \%>\%
+  dplyr::mutate(Species = as.numeric(Species)-1)
+Analysis("glm",iris, outcome = "Species")
 
 }

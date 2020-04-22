@@ -1,19 +1,3 @@
-#' Function that factorizes character values in a dataframe
-#'
-#' It makes dataframes functional for training algorithms
-factorize = function(column, df){
-  #' Check if column in integer or string and  turn to the correct type
-  #' to avoid other function turning into factor indices
-
-  if (class(df[1,column]) == "character"){
-    out = as.factor(df[,column])
-  } else {
-    out = df[,column]
-  }
-  return(out)
-}
-
-
 #' Perform cross-validation for a given model and given dataset
 #'
 #' This function performs cross validation for a given model and a given dataset and returns
@@ -27,15 +11,16 @@ factorize = function(column, df){
 #' @param data Data to be used for model training. Must be passed whole (not training/testing) as the splits
 #' happens internally
 #' @param outcome Response variable of choice. Must be one of the columns in data.
-#' @param folds Number of folds for k-fold cross validation. (default = 5)
+#' @param kfolds Number of folds for k-fold cross validation. (default = 5)
 #' @param train.proportion Proportion of data to be kept for training (default = 0.8)
 #'
 #' @return A plot of the ROC curve from test data and the corresponding AUC value
 #'
 #' @examples
-#' data(mtcars)
-#'
-#' Analysis("svm", mtcars, outcome = "cyl")
+#' data(iris)
+#' iris = iris %>% dplyr::filter(Species!="virginica") %>%
+#'   dplyr::mutate(Species = as.numeric(Species)-1)
+#' Analysis("glm",iris, outcome = "Species")
 #'
 #' @export
 Analysis = function(model, data, outcome = 'CVD_status', kfolds = 5, train.proportion = 0.8){
@@ -43,10 +28,6 @@ Analysis = function(model, data, outcome = 'CVD_status', kfolds = 5, train.propo
   if (!outcome %in% colnames(data)){
     stop(paste("Column", outcome, "not available in the dataset provided"))
   }
-
-  # turn character columns into factors
-  character.cols = colnames(data)[sapply(cov, typeof)=="character"]
-  data[,character.cols]  = lapply(character.cols, function(column) factorize(column, data))
 
   #reproducibility
   set.seed(1247)
@@ -108,12 +89,12 @@ Analysis = function(model, data, outcome = 'CVD_status', kfolds = 5, train.propo
 
     best.model = xgboost::xgb.train(data = train, nrounds = best_nround, objective = "binary:logistic",
                                     eta = best_eta, max_depth = best_depth, eval_metric = "auc")
-    prdct = predict(best.model, newdata = test)
-    pred.objct <- ROCR::prediction(prdct, getinfo(test,'label'))
+    prdct = stats::predict(best.model, newdata = test)
+    pred.objct <- ROCR::prediction(prdct, xgboost::getinfo(test,'label'))
     auc = ROCR::performance(pred.objct, "auc")
-    performance = ROCR::performance(pred.objct, "tpr", "fpr")
-    plot(performance, main = model)
-    abline(a = 0, b = 1, lty = 2)
+    perf = ROCR::performance(pred.objct, "tpr", "fpr")
+    ROCR::plot(perf, main = model)
+    graphics::abline(a = 0, b = 1, lty = 2)
     return(auc@y.values[[1]])
 
   }
@@ -122,10 +103,13 @@ Analysis = function(model, data, outcome = 'CVD_status', kfolds = 5, train.propo
     best_auc = 0
     best_kernel = 0
     best_cost = 0
+    iter = 1
     for (kernel in c("linear","radial")){
       for(cost in c(1,5,10,15)){
         ######### CV
         auc.list = c()
+        print(paste("Iteration ", as.character(iter)))
+        iter = iter + 1
         for (i in 1:5){
           valIndexes <- which(folds==i)
           ValData <- X.train[valIndexes, ]
@@ -139,7 +123,7 @@ Analysis = function(model, data, outcome = 'CVD_status', kfolds = 5, train.propo
           #  https://stackoverflow.com/questions/9028662/predict-maybe-im-not-understanding-it
           md.svm = e1071::svm(nonValOutcome ~ . , data = data.frame(nonValOutcome, nonValData),
                               kernel = kernel, cost = cost)
-          prdct = predict(md.svm, newdata =  ValData)
+          prdct = stats::predict(md.svm, newdata =  ValData)
           pred.objct = ROCR::prediction(prdct, ValOutcome)
           auc = ROCR::performance(pred.objct, "auc")
           auc.list = append(auc.list, auc@y.values[[1]])
@@ -152,16 +136,20 @@ Analysis = function(model, data, outcome = 'CVD_status', kfolds = 5, train.propo
         }
       }
     }
-
+    print(typeof(best_auc))
+    print(best_auc)
     bst.svm = e1071::svm(y.train~., data = data.frame(y.train, X.train),
                          kernel = best_kernel, cost = best_cost)
-    best.prdct = predict(bst.svm, X.test)
+    cat(paste0("Best params from SVM training:\n\t kernel: ", best_kernel,
+                "\n\t C-value: ", best_cost,
+                "\n\t AUC: ", best_auc,"\n"))
+    best.prdct = stats::predict(bst.svm, X.test)
     pred.objct = ROCR::prediction(best.prdct, y.test)
     auc = ROCR::performance(pred.objct, "auc")
     performance = ROCR::performance(pred.objct, "tpr", "fpr")
-    plot(performance)
-    abline(a = 0, b = 1, lty = 2)
-    title(model)
+    ROCR::plot(performance)
+    graphics::abline(a = 0, b = 1, lty = 2)
+    graphics::title(model)
     return(auc@y.values[[1]])
   }
 
@@ -179,14 +167,15 @@ Analysis = function(model, data, outcome = 'CVD_status', kfolds = 5, train.propo
 
     mod.cv = glmnet::cv.glmnet(X.train, y.train, foldid = folds,
                                type.measure = "auc", family = "binomial")
-
-    best.prdct = predict(mod.cv, s = "lambda.1se", newx = X.test)
+    cat(paste0("Best regularisation parameters for glm model (based on 1SE rule):\n",
+               "\tlambda1SE: ",mod.cv$lambda.1se,"\n"))
+    best.prdct = stats::predict(mod.cv, s = "lambda.1se", newx = X.test)
     pred.objct = ROCR::prediction(best.prdct, y.test)
     auc = ROCR::performance(pred.objct, "auc")
     performance = ROCR::performance(pred.objct, "tpr", "fpr")
-    plot(performance)
-    abline(a = 0, b = 1, lty = 2)
-    title(model)
+    ROCR::plot(performance)
+    graphics::abline(a = 0, b = 1, lty = 2)
+    graphics::title(model)
     return(auc@y.values[[1]])
   }
   else {

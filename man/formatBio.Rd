@@ -24,7 +24,7 @@ of the look up table (bio.dict), so basically readable names.
 }
 \examples{
 library(HDATDS)
-data("bio.original_example")
+data("bio.original_example") # this loads an object called bio.original
 
-bio = renameBio(bio.original_example)
+bio = formatBio(bio.original)
 }
