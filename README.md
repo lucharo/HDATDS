@@ -6,7 +6,7 @@ Package with useful functions for the MSc HDA&amp;ML Translational Data Sciences
 Functions built by March 31st:
 
 * `BHSCalculator()`
-* `factorBio()`
+* `formatBio()`
 * `quantile_check()` --> mostly internal use
 * `Analysis()`: performs cross-validation for any given model and given dataset or combination of datasets
 
@@ -30,21 +30,18 @@ conda install -c lucha6 r-hdatds
 __Example code:__
 ```
 # Original biomarker dataframe
-data("bio.original_example")
-
-# format names
-bio = formatBio(bio.original, measurement = "first")
-# alternatively
-# data("bio.example")
-
-# Load Covariates data frames (bio and cov) and merge them by ID
-bio = merge(bio, cov[,c("ID","age_cl","gender")], by = "ID")
+data("bio.example")
+data("cov")
+# Load biomarkers and covariates data frames (bio and cov) and merge them by ID
+bio = merge(bio.example, cov[,c("ID","age_cl","gender")], by = "ID")
 ids = bio$ID # keeping explicit copy of IDs
 rownames(bio) = bio[,1] # assuming ID is the first column
 bio = bio[,-1]
 bio$age_cl = as.factor(bio$age_cl)
 bio$gender = as.factor(bio$gender)
 
+bio = bio[complete.cases(bio), ] #function does not handle NAs internally
+
 # Run BHS calculation using paper reference
-scores_paper = BHSCalculator(bio, "Paper", stratified = T, bySystems = T)
+scores_paper = BHSCalculator(bio, "Paper", stratified = TRUE, bySystems = TRUE)
 ```
